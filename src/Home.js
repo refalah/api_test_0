@@ -6,8 +6,6 @@ function reducer(state, action){
     switch (action.type) {
         case "ADD_NEW":
             return {words : [...state.words, {text: action.text}]}
-        case "ADD_QUOTE":
-            return {words : {...state.words, post: action.post}}
         default:
             break;
     }
