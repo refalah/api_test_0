@@ -1,8 +1,28 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useReducer} from 'react';
+
+function reducer(state, action){
+    
+
+    switch (action.type) {
+        case "ADD_NEW":
+            return {words : [...state.words, {text: action.text}]}
+        case "ADD_QUOTE":
+            return {words : {...state.words, post: action.post}}
+        default:
+            break;
+    }
+}
+
 
 const Home = () => {
+    
     const [post, setPost] = useState([])
     const [quote, setQuote] = useState([])
+    const [kanye, setKanye] = useState([])
+
+    const [{words}, dispatch] = useReducer(reducer, {words: []})
+    const [text, setText] = useState()
+
     const changeNow = () => {
         fetch('https://api.kanye.rest/')
         .then((res) => res.json()).then((json) => setPost(json))
@@ -13,38 +33,22 @@ const Home = () => {
         setQuote(e.target.value);
     }
 
-    const addNew = (quote) => {
-        // fetch('https://api.kanye.rest/', {
-        //     method: 'POST',
-        //     body: JSON.stringify({
-        //         quote: quote
-        //     }),
-        //     headers: {
-        //         'Content-type': 'application/json'
-        //     }
-        // })
-        // .then((res) => res.json()).then((json) => console.log(json))
-        setPost({
-            ...post,
-            quote: quote,
+    const addNew = (text) => {
+        dispatch({
+            type: "ADD_NEW", text
         })
-        // setPost((prevPost) => {
-        //     return [
-        //         {
-        //             quote: quote,
-        //             id: Math.random().toString(),
-        //         },
-        //         ...prevPost
-        //     ]
-        // })
-        console.log(post)
+        setText("");
+    }
+
+    const addQuote = (ka) => {
+        setKanye([...kanye, ka])
     }
 
     useEffect(() => {
         changeNow();
     }, [])
 
-    console.log(post)
+    console.log(kanye)
     
     return (
         <div>
@@ -52,12 +56,22 @@ const Home = () => {
                 <div className='btn-group'>
                     <button onClick={() => changeNow()}>Change</button>
                     <br/>
-                    {[post.quote]}
+                    <div onClick={() => addQuote(post.quote) }>
+                        {post.quote}
+                    </div>                    
                     <br/>
                     <br/>
-                    <input type='text' onChange={(e) => captureInput(e)}></input>
-                    <button onClick={() => addNew(quote)}>Add New Quote</button>
+                    <input type='text' value={text} onChange={(e) => setText(e.target.value)}></input>
+                    <button onClick={() => addNew(text)}>Add New Quote</button>
                 </div>
+                {words.map((w, idx) => 
+                <div>
+                    <div key={w.text}>{w.text}</div>                    
+                </div>
+                )}
+                <br/>
+                <br/>
+                {kanye.map((k, idx) => <div>{k}</div>)}
             </div>
         </div>
     )
